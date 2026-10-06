@@ -1,7 +1,12 @@
 import 'package:cart_test/models/item_carrinho.dart';
+import 'package:cart_test/services/servico_frete.dart';
 
 class CarrinhoDeCompras {
+  final ServicoFrete servicoFrete;
   final List<ItemCarrinho> _itens = [];
+
+  CarrinhoDeCompras({ServicoFrete? servicoFrete})
+      : servicoFrete = servicoFrete ?? ServicoFrete();
 
   List<ItemCarrinho> get itens => List.unmodifiable(_itens);
 
@@ -35,5 +40,23 @@ class CarrinhoDeCompras {
 
   bool temDireitoAFreteGratis() {
     return calcularSubtotal() >= 150.0;
+  }
+
+  /// Calcula o valor final da compra considerando desconto e o serviço de frete externo.
+  /// Se a compra tiver direito a frete grátis, o serviço externo de frete NÃO é consultado.
+  Future<double> calcularTotalComFrete(
+    String cep, {
+    double percentualDesconto = 0.0,
+  }) async {
+    final subtotalComDesconto = calcularTotalComDesconto(
+      percentualDesconto: percentualDesconto,
+    );
+
+    if (temDireitoAFreteGratis()) {
+      return subtotalComDesconto;
+    }
+
+    final valorFrete = await servicoFrete.calcularFrete(cep);
+    return subtotalComDesconto + valorFrete;
   }
 }
