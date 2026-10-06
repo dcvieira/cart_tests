@@ -2,11 +2,7 @@ import 'package:cart_test/models/item_carrinho.dart';
 import 'package:cart_test/services/servico_frete.dart';
 
 class CarrinhoDeCompras {
-  final ServicoFrete servicoFrete;
   final List<ItemCarrinho> _itens = [];
-
-  CarrinhoDeCompras({ServicoFrete? servicoFrete})
-      : servicoFrete = servicoFrete ?? ServicoFrete();
 
   List<ItemCarrinho> get itens => List.unmodifiable(_itens);
 
@@ -56,6 +52,7 @@ class CarrinhoDeCompras {
       return subtotalComDesconto;
     }
 
+    final servicoFrete = ServicoFrete();
     final valorFrete = await servicoFrete.calcularFrete(cep);
     return subtotalComDesconto + valorFrete;
   }
